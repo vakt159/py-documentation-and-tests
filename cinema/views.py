@@ -221,7 +221,7 @@ class MovieViewSet(
         description="Returns specific movie",
         request=MovieDetailSerializer,
         responses={
-            201: MovieDetailSerializer,
+            200: MovieDetailSerializer,
             400: OpenApiResponse(description="Validation error"),
             401: OpenApiResponse(description="Unauthorized")
         },
@@ -276,9 +276,8 @@ class MovieViewSet(
     @extend_schema(
         summary="List of movies",
         description="Returns list of all movies",
-        request=GenreSerializer,
         responses={
-            200: GenreSerializer,
+            200: MovieListSerializer,
             400: OpenApiResponse(description="Validation error"),
             401: OpenApiResponse(description="Unauthorized")
         },
@@ -286,10 +285,9 @@ class MovieViewSet(
         parameters=[
             OpenApiParameter(
                 "title",
-                type={"type": "str"},
+                type=str,
                 description="Filter by title of movie",
                 required=False,
-                many=True,
                 explode=False,
             ),
             OpenApiParameter(
@@ -311,7 +309,7 @@ class MovieViewSet(
         ]
     )
     def list(self, request, *args, **kwargs):
-        """Returns list of genres"""
+        """Returns list of movies"""
         return super().list(request, *args, **kwargs)
 
 
@@ -359,7 +357,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         summary="Delete movie session",
         description="Remove specific movie session.",
         responses={
-            201: MovieSessionSerializer,
+            204: MovieSessionSerializer,
             400: OpenApiResponse(description="Validation error"),
             401: OpenApiResponse(description="Unauthorized")
         },
@@ -372,7 +370,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         summary="Partial update movie session",
         description="Partially updates specific movie session.",
         responses={
-            201: MovieSessionSerializer,
+            200: MovieSessionSerializer,
             400: OpenApiResponse(description="Validation error"),
             401: OpenApiResponse(description="Unauthorized")
         },
@@ -385,7 +383,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         summary="Update movie session",
         description="Updates specific movie session.",
         responses={
-            201: MovieSessionSerializer,
+            200: MovieSessionSerializer,
             400: OpenApiResponse(description="Validation error"),
             401: OpenApiResponse(description="Unauthorized")
         },
@@ -398,7 +396,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         summary="Get movie session",
         description="Get specific movie session.",
         responses={
-            201: MovieSessionDetailSerializer,
+            200: MovieSessionDetailSerializer,
             400: OpenApiResponse(description="Validation error"),
             401: OpenApiResponse(description="Unauthorized")
         },
@@ -424,7 +422,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         summary="List movie session",
         description="List of all movie session",
         responses={
-            201: MovieSessionListSerializer,
+            200: MovieSessionListSerializer,
             400: OpenApiResponse(description="Validation error"),
             401: OpenApiResponse(description="Unauthorized")
         },
