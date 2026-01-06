@@ -1,5 +1,4 @@
-from drf_spectacular.utils import extend_schema, OpenApiParameter, \
-    OpenApiResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -31,24 +30,8 @@ class CreateTokenView(ObtainAuthToken):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
     serializer_class = AuthTokenSerializer
 
-    @extend_schema(
-        summary="Login user",
-        description="Login user and generates JWT token",
-        request=AuthTokenSerializer,
-        responses={
-            201: AuthTokenSerializer,
-            400: OpenApiResponse(description="Validation error"),
-        },
-        tags=["Auth"],
-    )
-    def post(self, request, *args, **kwargs):
-        """Login user"""
-        return super().post(request, *args, **kwargs)
-
-
 class ManageUserView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     @extend_schema(
@@ -93,6 +76,5 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
         """Partially update user"""
         return super().patch(request, *args, **kwargs)
 
-
-def get_object(self):
-    return self.request.user
+    def get_object(self):
+        return self.request.user

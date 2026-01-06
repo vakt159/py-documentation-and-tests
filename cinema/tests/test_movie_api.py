@@ -177,20 +177,12 @@ class PublicMovieApiTests(TestCase):
     def test_movie_list_public(self) -> None:
         sample_movie(title="Movie 1")
         sample_movie(title="Movie 2")
-
         res = self.client.get(MOVIE_URL)
-
-        movies = Movie.objects.all()
-        serializer = MovieListSerializer(movies, many=True)
-
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_movie_retrieve_public(self) -> None:
         movie = sample_movie()
-
         res = self.client.get(detail_url(movie.id))
-        serializer = MovieDetailSerializer(movie)
-
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_movie_create_public_forbidden(self) -> None:
@@ -204,6 +196,16 @@ class PublicMovieApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_upload_image_public_unauthorize(self):
+        movie = sample_movie(title="Test")
+        url = image_upload_url(movie)
+        with tempfile.NamedTemporaryFile(suffix=".jpg") as ntf:
+            img = Image.new("RGB", (10, 10))
+            img.save(ntf, format="JPEG")
+            ntf.seek(0)
+            res = self.client.post(url, {"image": ntf}, format="multipart")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class AuthenticatedMovieApiTests(TestCase):
     def setUp(self):
@@ -212,6 +214,7 @@ class AuthenticatedMovieApiTests(TestCase):
             "user@test.com", "password"
         )
         self.client.force_authenticate(self.user)
+
 
     def test_movie_list_authenticated(self) -> None:
         sample_movie()
@@ -241,6 +244,16 @@ class AuthenticatedMovieApiTests(TestCase):
 
         res = self.client.post(MOVIE_URL, payload)
 
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_upload_image_forbidden(self):
+        movie = sample_movie(title="Test")
+        url = image_upload_url(movie)
+        with tempfile.NamedTemporaryFile(suffix=".jpg") as ntf:
+            img = Image.new("RGB", (10, 10))
+            img.save(ntf, format="JPEG")
+            ntf.seek(0)
+            res = self.client.post(url, {"image": ntf}, format="multipart")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_filter_by_title(self) -> None:
