@@ -1,3 +1,5 @@
+from drf_spectacular.utils import extend_schema, OpenApiParameter, \
+    OpenApiResponse
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -10,10 +12,38 @@ from user.serializers import UserSerializer, AuthTokenSerializer
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
+    @extend_schema(
+        summary="Create user",
+        description="Creates a new user account",
+        request=UserSerializer,
+        responses={
+            201: UserSerializer,
+            400: OpenApiResponse(description="Validation error"),
+        },
+        tags=["Auth"],
+    )
+    def post(self, request, *args, **kwargs):
+        """Creates user"""
+        return super().post(request, *args, **kwargs)
+
 
 class CreateTokenView(ObtainAuthToken):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
     serializer_class = AuthTokenSerializer
+
+    @extend_schema(
+        summary="Login user",
+        description="Login user and generates JWT token",
+        request=AuthTokenSerializer,
+        responses={
+            201: AuthTokenSerializer,
+            400: OpenApiResponse(description="Validation error"),
+        },
+        tags=["Auth"],
+    )
+    def post(self, request, *args, **kwargs):
+        """Login user"""
+        return super().post(request, *args, **kwargs)
 
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
@@ -21,5 +51,48 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    def get_object(self):
-        return self.request.user
+    @extend_schema(
+        summary="User profile",
+        description="Returns user profile",
+        request=UserSerializer,
+        responses={
+            201: UserSerializer,
+            401: OpenApiResponse(description="Unauthorized")
+        },
+        tags=["user"],
+    )
+    def get(self, request, *args, **kwargs):
+        """Returns user profile"""
+        return super().get(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Update user",
+        description="Updates user profile",
+        request=UserSerializer,
+        responses={
+            201: UserSerializer,
+            401: OpenApiResponse(description="Unauthorized")
+        },
+        tags=["user"],
+    )
+    def put(self, request, *args, **kwargs):
+        """Update user"""
+        return super().put(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Partially update user",
+        description="Partially updates user profile",
+        request=UserSerializer,
+        responses={
+            201: UserSerializer,
+            401: OpenApiResponse(description="Unauthorized")
+        },
+        tags=["user"],
+    )
+    def patch(self, request, *args, **kwargs):
+        """Partially update user"""
+        return super().patch(request, *args, **kwargs)
+
+
+def get_object(self):
+    return self.request.user
